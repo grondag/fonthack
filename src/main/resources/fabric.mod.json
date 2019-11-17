@@ -1,0 +1,44 @@
+{
+	"schemaVersion": 1,
+	"id": "fonthack",
+	"version": "${version}",
+	"name": "Font Hack",
+	"description": "Library for enhanced font rendering.",
+	"authors": [
+		{
+			"name": "Grondag",
+			"contact": {
+				"github": "https://github.com/grondag"
+			}
+		}
+	],
+	"contributors": [
+	],
+	"contact": {
+		"homepage": "https://github.com/grondag/fonthack",
+		"sources": "https://github.com/grondag/fonthack"
+	},
+	"license": "APACHE",
+	"icon": "assets/mcmd/fonthack_icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"grondag.fonthack.FontHackClient"
+		]
+	},
+	"mixins": [
+	  {
+	  	  "config": "fonthack.client.json",
+	      "environment": "client"
+	  }
+    ],
+
+	"depends": {
+		"fabricloader": ">=0.4.0",
+		"fabric": "*"
+	},
+	"custom": {
+    	"modmenu:api": true,
+    	"modmenu:clientsideOnly": true
+  	}
+}

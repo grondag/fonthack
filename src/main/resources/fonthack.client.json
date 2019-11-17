@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "grondag.fonthack.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "MixinTextRenderer"
+      ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
