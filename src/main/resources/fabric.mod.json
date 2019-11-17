@@ -19,13 +19,8 @@
 		"sources": "https://github.com/grondag/fonthack"
 	},
 	"license": "APACHE",
-	"icon": "assets/mcmd/fonthack_icon.png",
+	"icon": "assets/fonthack/fonthack_icon.png",
 	"environment": "client",
-	"entrypoints": {
-		"client": [
-			"grondag.fonthack.FontHackClient"
-		]
-	},
 	"mixins": [
 	  {
 	  	  "config": "fonthack.client.json",
