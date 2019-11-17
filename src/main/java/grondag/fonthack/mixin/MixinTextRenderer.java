@@ -17,9 +17,4 @@ public abstract class MixinTextRenderer implements TextRendererExt {
 	public FontStorage ext_fontStorage() {
 		return fontStorage;
 	}
-
-	@Override
-	public TextureManager ext_textureManager() {
-		return textureManager;
-	}
 }
