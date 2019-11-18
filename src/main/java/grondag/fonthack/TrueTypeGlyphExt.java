@@ -12,4 +12,6 @@ public interface TrueTypeGlyphExt {
 	float ext_advance();
 
 	int ext_glyphIndex();
+
+	TrueTypeFontExt ext_font();
 }

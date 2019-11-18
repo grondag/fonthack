@@ -3,6 +3,7 @@
   "package": "grondag.fonthack.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+  	"MixinFontType",
     "MixinTextRenderer",
     "MixinTrueTypeFont",
     "MixinTrueTypeFontGlyph"

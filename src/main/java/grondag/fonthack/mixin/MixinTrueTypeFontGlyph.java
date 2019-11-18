@@ -3,7 +3,9 @@ package grondag.fonthack.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
+import grondag.fonthack.TrueTypeFontExt;
 import grondag.fonthack.TrueTypeGlyphExt;
+import net.minecraft.client.font.TrueTypeFont;
 
 @Mixin(targets = "net.minecraft.client.font.TrueTypeFont$TtfGlyph")
 public abstract class MixinTrueTypeFontGlyph implements TrueTypeGlyphExt {
@@ -13,6 +15,7 @@ public abstract class MixinTrueTypeFontGlyph implements TrueTypeGlyphExt {
 	@Shadow private float ascent;
 	@Shadow private float advance;
 	@Shadow private int glyphIndex;
+	@Shadow private TrueTypeFont field_2336;
 
 	@Override
 	public int ext_width() {
@@ -42,5 +45,10 @@ public abstract class MixinTrueTypeFontGlyph implements TrueTypeGlyphExt {
 	@Override
 	public int ext_glyphIndex() {
 		return glyphIndex;
+	}
+
+	@Override
+	public TrueTypeFontExt ext_font() {
+		return (TrueTypeFontExt) field_2336;
 	}
 }
