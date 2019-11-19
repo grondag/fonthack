@@ -1,5 +1,9 @@
 package grondag.fonthack.font;
 
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -28,15 +32,25 @@ public class NiceFont implements Font {
 	private final float scaleFactor;
 	private final float ascent;
 
+	// TODO: remove scale and oversample if not used
 	public NiceFont(STBTTFontinfo info, float scale, float oversample, float shiftX, float shiftY, String excluded) {
 		this.info = info;
-		this.oversample = oversample;
+		this.oversample = 4; //oversample;
 		excluded.chars().forEach((int_1) -> {
 			excludedCharacters.add((char)(int_1 & '\uffff'));
 		});
 		this.shiftX = shiftX * oversample;
 		this.shiftY = shiftY * oversample;
-		scaleFactor = STBTruetype.stbtt_ScaleForPixelHeight(info, scale * oversample);
+
+		final BufferedImage sizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
+		final Graphics2D sizeGraphics = (Graphics2D) sizeImage.getGraphics();
+		sizeGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		sizeGraphics.setFont(font);
+		final FontMetrics fontMetrics = sizeGraphics.getFontMetrics();
+		fontHeight = fontMetrics.getHeight();
+
+		//scaleFactor = STBTruetype.stbtt_ScaleForPixelHeight(info, scale * oversample);
+		scaleFactor = STBTruetype.stbtt_ScaleForPixelHeight(info, FontTextureHelper.cellHeight - FontTextureHelper.padding * 2);
 
 		try (final MemoryStack mem = MemoryStack.stackPush()) {
 			final IntBuffer bAscent = mem.mallocInt(1);
@@ -136,15 +150,46 @@ public class NiceFont implements Font {
 		}
 
 		@Override
+		public float getBoldOffset() {
+			// FIXME: needs to be configurable per font
+			return 0.5F;
+		}
+
+		@Override
 		public float getAscent() {
 			return glyphAscent;
 		}
 
 		@Override
 		public void upload(int x, int y) {
-			try(final NativeImage img = new NativeImage(NativeImage.Format.LUMINANCE, width, height, false);) {
-				img.makeGlyphBitmapSubpixel(info, glyphIndex, width, height, scaleFactor, scaleFactor, shiftX, shiftY, 0, 0);
-				img.upload(0, x, y, 0, 0, width, height, false);
+			final int p = FontTextureHelper.padding;
+			final int h = FontTextureHelper.cellHeight;
+			final int w = FontTextureHelper.ceil16(width + p + p);
+
+			try(final NativeImage img0 = new NativeImage(NativeImage.Format.LUMINANCE, 64, 64, false);
+				final NativeImage img1 = new NativeImage(NativeImage.Format.LUMINANCE, 32, 32, false);
+				final NativeImage img2 = new NativeImage(NativeImage.Format.LUMINANCE, 16, 16, false);
+				final NativeImage img3 = new NativeImage(NativeImage.Format.LUMINANCE, 8, 8, false);
+				) {
+
+				img0.makeGlyphBitmapSubpixel(info, glyphIndex, width, height, scaleFactor, scaleFactor, shiftX, shiftY, p, p);
+				img0.upload(0, x, y, 0, 0, w, h, true, true, true);
+
+				// TODO: remove
+				if (height + p + p > FontTextureHelper.cellHeight) {
+					System.out.println("Exceeded cell height: " + y + p + p);
+				}
+
+				final NativeImage images[] = new NativeImage[4];
+				images[0] = img0;
+				images[1] = img1;
+				images[2] = img2;
+				images[3] = img3;
+
+				FontTextureHelper.generateMipmaps(images);
+				for (int i = 1; i <= 3; i++) {
+					images[i].upload(i, x >> i, y >> i, 0, 0, w >> i, h >> i, true, true, true);
+				}
 			}
 		}
 

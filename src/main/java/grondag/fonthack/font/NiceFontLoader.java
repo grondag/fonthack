@@ -79,7 +79,7 @@ public class NiceFontLoader implements FontLoader {
 		try (final Resource font = rm.getResource(new Identifier(filename.getNamespace(), "font/" + filename.getPath()))) {
 			final ByteBuffer buff = TextureUtil.readResource(font.getInputStream());
 			buff.flip();
-			return new TrueTypeFont(TrueTypeFont.getSTBTTFontInfo(buff), size, oversample, shiftX, shiftY, excludedCharacters);
+			return new NiceFont(TrueTypeFont.getSTBTTFontInfo(buff), size, oversample, shiftX, shiftY, excludedCharacters);
 		} catch (final IOException ex) {
 			FontHackClient.LOG.error("Couldn't load truetype font {}", filename, ex);
 			return null;

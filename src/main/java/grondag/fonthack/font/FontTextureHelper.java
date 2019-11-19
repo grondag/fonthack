@@ -1,12 +1,14 @@
 package grondag.fonthack.font;
 
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.util.math.MathHelper;
 
 public class FontTextureHelper {
 
-	public static boolean itMe = false;
 	public static int size = 512;
-	public static int fontHeight  = 64;
+	public static int cellHeight  = 64;
+	public static int padding = 4;
+	public static int lod = 3;
 
 	private static final float[] LUMINANCE_TO_LINEAR_MAP = new float[256];
 
@@ -16,15 +18,14 @@ public class FontTextureHelper {
 		}
 	}
 
-	@SuppressWarnings("resource")
-	public void generateMipmaps(final NativeImage[] images) {
+	public static void generateMipmaps(final NativeImage[] images) {
 		final int limit = images.length;
 		NativeImage base = images[0];
 
 		if (limit > 0) {
 
-			for(int i = 1; i <= limit; ++i) {
-				final NativeImage img = new NativeImage(base.getWidth() >> 1, base.getHeight() >> 1, false);
+			for(int i = 1; i < limit; ++i) {
+				final NativeImage img = images[i];
 				final NativeImageExt imgExt = (NativeImageExt)(Object) img;
 				final int w = img.getWidth();
 				final int h = img.getHeight();
@@ -39,7 +40,6 @@ public class FontTextureHelper {
 					}
 				}
 
-				images[i] = img;
 				base  = img;
 			}
 		}
@@ -55,8 +55,8 @@ public class FontTextureHelper {
 			+ LUMINANCE_TO_LINEAR_MAP[int_3 & 255] * 0.25f
 			+ LUMINANCE_TO_LINEAR_MAP[int_4 & 255]* 0.25f;
 
-		final int result = (int)(Math.pow(v, 0.45454545454545453D) * 255.0D);
+		final int result = MathHelper.clamp((int)(Math.pow(v, 0.45454545454545453D) * 255.0D), 0, 255);
 
-		return result < 96 ? 0 : (byte) result;
+		return (byte) result; // < 96 ? 0 : (byte) result;
 	}
 }
