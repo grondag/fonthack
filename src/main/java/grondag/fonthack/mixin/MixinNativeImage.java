@@ -19,12 +19,30 @@ public abstract class MixinNativeImage implements NativeImageExt {
 	@Shadow abstract protected void checkAllocated();
 
 	@Override
-	public void ext_setLuminance(int u, int v, byte luminance) {
-		if (format != NativeImage.Format.LUMINANCE) {
+	public void ext_setLuminanceAlpha(int u, int v, byte luminance, byte alpha) {
+		if (format != NativeImage.Format.LUMINANCE_ALPHA) {
 			throw new IllegalArgumentException(String.format("ext_setLuminance only works on LUMINANCE images; have %s", format));
 		} else if (u <= width && v <= height) {
 			checkAllocated();
-			MemoryUtil.memByteBuffer(pointer, sizeBytes).put(u + v * width, luminance);
+			final int offset = (u + v * width) * 2;
+			MemoryUtil.memByteBuffer(pointer, sizeBytes).put(offset, luminance);
+			MemoryUtil.memByteBuffer(pointer, sizeBytes).put(offset + 1, alpha);
+		} else {
+			throw new IllegalArgumentException(String.format("(%s, %s) outside of image bounds (%s, %s)", u, v, width, height));
+		}
+	}
+
+	@Override
+	public int ext_getPackedLuminanceAlpha(int u, int v) {
+		if (format != NativeImage.Format.LUMINANCE_ALPHA) {
+			throw new IllegalArgumentException(String.format("ext_setLuminance only works on LUMINANCE images; have %s", format));
+		} else if (u <= width && v <= height) {
+			checkAllocated();
+			final int offset = (u + v * width) * 2;
+			final int l = MemoryUtil.memByteBuffer(pointer, sizeBytes).get(offset);
+			final int a = MemoryUtil.memByteBuffer(pointer, sizeBytes).get(offset + 1);
+
+			return l | (a << 8);
 		} else {
 			throw new IllegalArgumentException(String.format("(%s, %s) outside of image bounds (%s, %s)", u, v, width, height));
 		}

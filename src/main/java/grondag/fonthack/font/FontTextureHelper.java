@@ -20,7 +20,7 @@ public class FontTextureHelper {
 
 	public static void generateMipmaps(final NativeImage[] images) {
 		final int limit = images.length;
-		NativeImage base = images[0];
+		NativeImageExt base = (NativeImageExt)(Object) images[0];
 
 		if (limit > 0) {
 
@@ -32,15 +32,20 @@ public class FontTextureHelper {
 
 				for(int u = 0; u < w; ++u) {
 					for(int v = 0; v < h; ++v) {
-						imgExt.ext_setLuminance(u, v, blendPixels(
-							base.getPixelOpacity(u * 2 + 0, v * 2 + 0),
-							base.getPixelOpacity(u * 2 + 1, v * 2 + 0),
-							base.getPixelOpacity(u * 2 + 0, v * 2 + 1),
-							base.getPixelOpacity(u * 2 + 1, v * 2 + 1)));
+						final int a = base.ext_getPackedLuminanceAlpha(u * 2 + 0, v * 2 + 0);
+						final int b = base.ext_getPackedLuminanceAlpha(u * 2 + 1, v * 2 + 0);
+						final int c = base.ext_getPackedLuminanceAlpha(u * 2 + 0, v * 2 + 1);
+						final int d = base.ext_getPackedLuminanceAlpha(u * 2 + 1, v * 2 + 1);
+
+						final byte luminance = blendPixels(a & 0xFF, b & 0xFF, c & 0xFF, d & 0xFF);
+
+						final byte alpha = blendPixels((a >> 8) & 0xFF, (b >> 8) & 0xFF, (c >> 8) & 0xFF, (d >> 8) & 0xFF);
+
+						imgExt.ext_setLuminanceAlpha(u, v, luminance, alpha);
 					}
 				}
 
-				base  = img;
+				base  = (NativeImageExt)(Object) img;
 			}
 		}
 	}
@@ -49,14 +54,15 @@ public class FontTextureHelper {
 		return (val & 0xF) == 0 ? val : val + (~(val & 0xF) & 0xF);
 	}
 
-	private static final byte blendPixels(final int int_1, final int int_2, final int int_3, final int int_4) {
-		final float v = LUMINANCE_TO_LINEAR_MAP[int_1 & 255] * 0.25f
-			+ LUMINANCE_TO_LINEAR_MAP[int_2 & 255] * 0.25f
-			+ LUMINANCE_TO_LINEAR_MAP[int_3 & 255] * 0.25f
-			+ LUMINANCE_TO_LINEAR_MAP[int_4 & 255]* 0.25f;
-
-		final int result = MathHelper.clamp((int)(Math.pow(v, 0.45454545454545453D) * 255.0D), 0, 255);
-
-		return (byte) result; // < 96 ? 0 : (byte) result;
+	private static final byte blendPixels(final int a, final int b, final int c, final int d) {
+		return (byte) MathHelper.clamp(Math.round(0.25f * a + 0.25f *  b + 0.25f * c + 0.25f * d), 0, 255);
+		//		final float v = LUMINANCE_TO_LINEAR_MAP[a & 255] * 0.25f
+		//			+ LUMINANCE_TO_LINEAR_MAP[b & 255] * 0.25f
+		//			+ LUMINANCE_TO_LINEAR_MAP[c & 255] * 0.25f
+		//			+ LUMINANCE_TO_LINEAR_MAP[d & 255]* 0.25f;
+		//
+		//		final int result = MathHelper.clamp((int)(Math.pow(v, 0.45454545454545453D) * 255.0D), 0, 255);
+		//
+		//		return (byte) result; // < 96 ? 0 : (byte) result;
 	}
 }

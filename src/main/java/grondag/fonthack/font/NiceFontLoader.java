@@ -1,23 +1,17 @@
 package grondag.fonthack.font;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
 import javax.annotation.Nullable;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.mojang.blaze3d.platform.TextureUtil;
 
 import grondag.fonthack.FontHackClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.font.Font;
 import net.minecraft.client.font.FontLoader;
-import net.minecraft.client.font.TrueTypeFont;
-import net.minecraft.resource.Resource;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.JsonHelper;
@@ -76,11 +70,9 @@ public class NiceFontLoader implements FontLoader {
 	@Override
 	@Nullable
 	public Font load(ResourceManager rm) {
-		try (final Resource font = rm.getResource(new Identifier(filename.getNamespace(), "font/" + filename.getPath()))) {
-			final ByteBuffer buff = TextureUtil.readResource(font.getInputStream());
-			buff.flip();
-			return new NiceFont(TrueTypeFont.getSTBTTFontInfo(buff), size, oversample, shiftX, shiftY, excludedCharacters);
-		} catch (final IOException ex) {
+		try {
+			return new NiceFont(new Identifier(filename.getNamespace(), "font/" + filename.getPath()), size, oversample, shiftX, shiftY, excludedCharacters);
+		} catch (final Exception ex) {
 			FontHackClient.LOG.error("Couldn't load truetype font {}", filename, ex);
 			return null;
 		}
