@@ -31,9 +31,8 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 
 	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/TextureUtil;prepareImage(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
 	private void hookPrepareImage(NativeImage.GLFormat format, int glId, int w, int h) {
-		// TODO: need a real way to detect load path
-		if(id.getNamespace().equalsIgnoreCase("adversity")) {
-			TextureUtil.prepareImage(format, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
+		if(FontTextureHelper.isNice) {
+			TextureUtil.prepareImage(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
 			isNice = true;
 			size = FontTextureHelper.size;
 			cellHeight = FontTextureHelper.ceil16(FontTextureHelper.cellHeight);

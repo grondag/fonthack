@@ -1,4 +1,4 @@
-package grondag.fonthack;
+package grondag.fonthack.ext;
 
 public interface TrueTypeGlyphExt {
 	int ext_width();

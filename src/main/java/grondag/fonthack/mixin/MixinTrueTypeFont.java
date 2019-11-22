@@ -4,7 +4,7 @@ import org.lwjgl.stb.STBTTFontinfo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import grondag.fonthack.TrueTypeFontExt;
+import grondag.fonthack.ext.TrueTypeFontExt;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import net.minecraft.client.font.TrueTypeFont;
 

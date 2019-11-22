@@ -3,8 +3,8 @@ package grondag.fonthack.mixin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-import grondag.fonthack.TrueTypeFontExt;
-import grondag.fonthack.TrueTypeGlyphExt;
+import grondag.fonthack.ext.TrueTypeFontExt;
+import grondag.fonthack.ext.TrueTypeGlyphExt;
 import net.minecraft.client.font.TrueTypeFont;
 
 @Mixin(targets = "net.minecraft.client.font.TrueTypeFont$TtfGlyph")

@@ -1,4 +1,4 @@
-package grondag.fonthack;
+package grondag.fonthack.ext;
 
 import org.apiguardian.api.API;
 
