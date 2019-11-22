@@ -14,7 +14,7 @@ public abstract class MixinNativeImage implements NativeImageExt {
 	@Shadow private int height;
 	@Shadow private boolean isStbImage;
 	@Shadow private long pointer;
-	@Shadow private int sizeBytes;
+	@Shadow private long sizeBytes;
 
 	@Shadow abstract protected void checkAllocated();
 
@@ -25,8 +25,8 @@ public abstract class MixinNativeImage implements NativeImageExt {
 		} else if (u <= width && v <= height) {
 			checkAllocated();
 			final int offset = (u + v * width) * 2;
-			MemoryUtil.memByteBuffer(pointer, sizeBytes).put(offset, luminance);
-			MemoryUtil.memByteBuffer(pointer, sizeBytes).put(offset + 1, alpha);
+			MemoryUtil.memByteBuffer(pointer, (int) sizeBytes).put(offset, luminance);
+			MemoryUtil.memByteBuffer(pointer, (int) sizeBytes).put(offset + 1, alpha);
 		} else {
 			throw new IllegalArgumentException(String.format("(%s, %s) outside of image bounds (%s, %s)", u, v, width, height));
 		}
@@ -39,8 +39,8 @@ public abstract class MixinNativeImage implements NativeImageExt {
 		} else if (u <= width && v <= height) {
 			checkAllocated();
 			final int offset = (u + v * width) * 2;
-			final int l = MemoryUtil.memByteBuffer(pointer, sizeBytes).get(offset);
-			final int a = MemoryUtil.memByteBuffer(pointer, sizeBytes).get(offset + 1);
+			final int l = MemoryUtil.memByteBuffer(pointer, (int) sizeBytes).get(offset);
+			final int a = MemoryUtil.memByteBuffer(pointer, (int) sizeBytes).get(offset + 1);
 
 			return l | (a << 8);
 		} else {

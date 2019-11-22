@@ -39,10 +39,10 @@ public class FontTextureHelper {
 						//						final int c = base.ext_getPackedLuminanceAlpha(u * 2 + 0, v * 2 + 1);
 						//						final int d = base.ext_getPackedLuminanceAlpha(u * 2 + 1, v * 2 + 1);
 
-						final int a = base.getPixelRGBA(u * 2 + 0, v * 2 + 0);
-						final int b = base.getPixelRGBA(u * 2 + 1, v * 2 + 0);
-						final int c = base.getPixelRGBA(u * 2 + 0, v * 2 + 1);
-						final int d = base.getPixelRGBA(u * 2 + 1, v * 2 + 1);
+						final int a = base.getPixelRgba(u * 2 + 0, v * 2 + 0);
+						final int b = base.getPixelRgba(u * 2 + 1, v * 2 + 0);
+						final int c = base.getPixelRgba(u * 2 + 0, v * 2 + 1);
+						final int d = base.getPixelRgba(u * 2 + 1, v * 2 + 1);
 
 						//						final byte luminance = blendPixels(a & 0xFF, b & 0xFF, c & 0xFF, d & 0xFF);
 						//
@@ -52,7 +52,7 @@ public class FontTextureHelper {
 						final int blue = blendPixels((a >> 16) & 0xFF, (b >> 16) & 0xFF, (c >> 16) & 0xFF, (d >> 16) & 0xFF);
 						final int alpha = blendPixels((a >> 24) & 0xFF, (b >> 24) & 0xFF, (c >> 24) & 0xFF, (d >> 24) & 0xFF);
 						//						imgExt.ext_setLuminanceAlpha(u, v, luminance, alpha);
-						img.setPixelRGBA(u, v, red | (green << 8) | (blue << 16) | (alpha << 24));
+						img.setPixelRgba(u, v, red | (green << 8) | (blue << 16) | (alpha << 24));
 					}
 				}
 

@@ -39,6 +39,8 @@ import net.minecraft.util.Identifier;
  * Needs overall performance / memory / sanity cleanup
  *
  */
+//TODO: remove suppression
+@SuppressWarnings("unused")
 @Environment(EnvType.CLIENT)
 public class NiceFont implements Font {
 	private final Identifier id;
@@ -91,11 +93,11 @@ public class NiceFont implements Font {
 	private @Nullable java.awt.Font getFont(Identifier res, float size)
 	{
 		try(Resource input = MinecraftClient.getInstance().getResourceManager().getResource(res);
-			InputStream stream = input.getInputStream())
+				InputStream stream = input.getInputStream())
 		{
 			return java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, stream)
-				.deriveFont(size)
-				.deriveFont(ImmutableMap.of(TextAttribute.KERNING, TextAttribute.KERNING_ON));
+					.deriveFont(size)
+					.deriveFont(ImmutableMap.of(TextAttribute.KERNING, TextAttribute.KERNING_ON));
 		}
 		catch (final Exception e)
 		{
@@ -212,10 +214,10 @@ public class NiceFont implements Font {
 			final int w = FontTextureHelper.ceil16(width + p + p);
 
 			try(final NativeImage img0 = new NativeImage(NativeImage.Format.RGBA, 64, 64, false);
-				final NativeImage img1 = new NativeImage(NativeImage.Format.RGBA, 32, 32, false);
-				final NativeImage img2 = new NativeImage(NativeImage.Format.RGBA, 16, 16, false);
-				final NativeImage img3 = new NativeImage(NativeImage.Format.RGBA, 8, 8, false);
-				) {
+					final NativeImage img1 = new NativeImage(NativeImage.Format.RGBA, 32, 32, false);
+					final NativeImage img2 = new NativeImage(NativeImage.Format.RGBA, 16, 16, false);
+					final NativeImage img3 = new NativeImage(NativeImage.Format.RGBA, 8, 8, false);
+					) {
 
 				final BufferedImage fontImage = getFontImage();
 				final Raster rast = fontImage.getData();
@@ -225,11 +227,11 @@ public class NiceFont implements Font {
 				for (int u = 0; u < 64; u++) {
 					for (int v = 0; v < 64; v++) {
 						px = rast.getPixel(u, v, px);
-						img0.setPixelRGBA(u, v, px[0] | (px[1] << 8) | (px[2] << 16) | (px[3] << 24));
+						img0.setPixelRgba(u, v, px[0] | (px[1] << 8) | (px[2] << 16) | (px[3] << 24));
 					}
 				}
 
-				img0.upload(0, x, y, 0, 0, w, h, true, true, true);
+				img0.upload(0, x, y, 0, 0, w, h, true, true, true, false);
 
 				// TODO: remove
 				if (height + p + p > FontTextureHelper.cellHeight) {
@@ -255,7 +257,7 @@ public class NiceFont implements Font {
 				//				}
 
 				for (int i = 1; i <= 3; i++) {
-					images[i].upload(i, x >> i, y >> i, 0, 0, w >> i, h >> i, true, true, true);
+					images[i].upload(i, x >> i, y >> i, 0, 0, w >> i, h >> i, true, true, true, false);
 				}
 			}
 		}

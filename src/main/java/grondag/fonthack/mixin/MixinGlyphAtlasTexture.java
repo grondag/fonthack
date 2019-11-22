@@ -7,20 +7,24 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import com.mojang.blaze3d.platform.TextureUtil;
-
 import grondag.fonthack.font.FontTextureHelper;
 import net.minecraft.client.font.GlyphAtlasTexture;
 import net.minecraft.client.font.GlyphRenderer;
 import net.minecraft.client.font.RenderableGlyph;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.util.Identifier;
 
 @Mixin(GlyphAtlasTexture.class)
 public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 	@Shadow private boolean hasColor;
 	@Shadow private Identifier id;
+
+	// TODO: will probably need to use custom render layers to get anti-aliasing
+	@Shadow private RenderLayer field_21690;
+	@Shadow private RenderLayer field_21691;
 
 	private boolean isNice = false;
 	private int size = 256;
@@ -29,7 +33,7 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 	private int xNext = 0;
 	private int yNext = 0;
 
-	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/TextureUtil;prepareImage(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
+	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureUtil;prepareImage(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
 	private void hookPrepareImage(NativeImage.GLFormat format, int glId, int w, int h) {
 		if(FontTextureHelper.isNice) {
 			TextureUtil.prepareImage(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
@@ -69,9 +73,9 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 
 		glyph.upload(x, y);
 
-		return new GlyphRenderer(id,
-			(p + x + 0.01F) / size, (p + x - 0.01F + glyph.getWidth()) / size,
-			(p + y + 0.01F) / size, (p + y - 0.01F + glyph.getHeight()) / size,
-			glyph.getXMin(), glyph.getXMax(), glyph.getYMin(), glyph.getYMax());
+		return new GlyphRenderer(field_21690, field_21691,
+				(p + x + 0.01F) / size, (p + x - 0.01F + glyph.getWidth()) / size,
+				(p + y + 0.01F) / size, (p + y - 0.01F + glyph.getHeight()) / size,
+				glyph.getXMin(), glyph.getXMax(), glyph.getYMin(), glyph.getYMax());
 	}
 }
