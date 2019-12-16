@@ -1,0 +1,16 @@
+{
+    "providers": [
+        {
+            "type": "ttf",
+            "file": "fonthack:source_sans_pro-regular.otf",
+            "size": 16,
+            "oversample": 2,
+            "skip": [
+             	"\u20b9\ue0ff\ueffd\uf000\uf001\uf002\uf0ff\uf200\uf506\uf507\uf508\uf509\uf50a\uf50b\uf50c",
+				"\uf50d\uf50e\uf50f\uf510\uf511\uf800\uf801\uf802\uf803\uf804\uf805\uf806\uf807\uf808\uf809\uf80a",
+				"\uf80b\uf80c\uf80d\uf80e\uf80f\uf810\uf811\uf812\uf813\uf814\uf815\uf816\uf817\uf818\uf819\uf81a",
+				"\uf81b\uf81c\uf81d"
+            ]
+        }
+    ]
+}
