@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import grondag.fonthack.font.FontTextureHelper;
 import net.minecraft.client.font.GlyphAtlasTexture;
 import net.minecraft.client.font.GlyphRenderer;
 import net.minecraft.client.font.RenderableGlyph;
@@ -16,6 +15,8 @@ import net.minecraft.client.texture.AbstractTexture;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.client.texture.TextureUtil;
 import net.minecraft.util.Identifier;
+
+import grondag.fonthack.font.FontTextureHelper;
 
 @Mixin(GlyphAtlasTexture.class)
 public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
@@ -33,16 +34,16 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 	private int xNext = 0;
 	private int yNext = 0;
 
-	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureUtil;prepareImage(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
+	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureUtil;method_24960(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
 	private void hookPrepareImage(NativeImage.GLFormat format, int glId, int w, int h) {
 		if(FontTextureHelper.isNice) {
-			TextureUtil.prepareImage(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
+			TextureUtil.method_24961(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
 			isNice = true;
 			size = FontTextureHelper.size;
 			cellHeight = FontTextureHelper.ceil16(FontTextureHelper.cellHeight);
 			setFilter(false, true);
 		} else {
-			TextureUtil.prepareImage(format, glId, w, h);
+			TextureUtil.method_24960(format, glId, w, h);
 			isNice = false;
 		}
 	}
