@@ -15,21 +15,22 @@ import java.io.InputStream;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableMap;
+import it.unimi.dsi.fastutil.chars.Char2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lwjgl.system.MemoryStack;
 
-import com.google.common.collect.ImmutableMap;
-
-import grondag.fonthack.ext.RenderableGlyphExt;
-import it.unimi.dsi.fastutil.chars.Char2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.chars.CharArraySet;
-import it.unimi.dsi.fastutil.chars.CharSet;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.Font;
 import net.minecraft.client.texture.NativeImage;
 import net.minecraft.resource.Resource;
 import net.minecraft.util.Identifier;
+
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+import grondag.fonthack.ext.RenderableGlyphExt;
 
 /**
  * Mostly works, but needs cleanup in following areas
@@ -45,7 +46,7 @@ import net.minecraft.util.Identifier;
 public class NiceFont implements Font {
 	private final Identifier id;
 	private final float oversample;
-	private final CharSet excludedCharacters = new CharArraySet();
+	private final IntSet excludedCharacters = new IntArraySet();
 	//	private final float shiftX;
 	//	private final float shiftY;
 	//	private final float scaleFactor;
@@ -70,7 +71,7 @@ public class NiceFont implements Font {
 		frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_ON, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
 		excluded.chars().forEach((int_1) -> {
-			excludedCharacters.add((char)(int_1 & '\uffff'));
+			excludedCharacters.add(int_1 & '\uffff');
 		});
 		//		this.shiftX = shiftX * oversample;
 		//		this.shiftY = shiftY * oversample;
@@ -108,7 +109,7 @@ public class NiceFont implements Font {
 
 	@Override
 	@Nullable
-	public NiceGlyph getGlyph(char c) {
+	public NiceGlyph getGlyph(int c) {
 		if (excludedCharacters.contains(c)) {
 			return null;
 		} else {
@@ -132,7 +133,8 @@ public class NiceFont implements Font {
 
 		private final Char2FloatOpenHashMap kerning = new Char2FloatOpenHashMap();
 
-		private NiceGlyph(char c) { //int left, int right, int bottom, int top, float advanceIn, float float_2, int index) {
+		private NiceGlyph(int i) { //int left, int right, int bottom, int top, float advanceIn, float float_2, int index) {
+			final char c = (char) i;
 			width = fontMetrics.charWidth(c);
 			height = fontMetrics.getHeight();
 			rawAdvance = computeAdvance(c);
@@ -281,6 +283,11 @@ public class NiceFont implements Font {
 		public boolean hasColor() {
 			return false;
 		}
+	}
+
+	@Override
+	public IntSet method_27442() {
+		return excludedCharacters;
 	}
 }
 
