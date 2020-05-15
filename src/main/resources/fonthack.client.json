@@ -6,6 +6,7 @@
   	"MixinFontType",
   	"MixinFontStorage",
   	"MixinGlyphAtlasTexture",
+  	"MixinMinecraftClient",
   	"MixinNativeImage",
     "MixinTextRenderer",
     "MixinTrueTypeFont",
