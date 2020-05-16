@@ -3,6 +3,10 @@
   "package": "grondag.fonthack.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+  	"MixinFontManager",
+  	"MixinMinecraftClient"
+  ],
+  "_mixins": [
   	"MixinFontType",
   	"MixinFontStorage",
   	"MixinFontManager",

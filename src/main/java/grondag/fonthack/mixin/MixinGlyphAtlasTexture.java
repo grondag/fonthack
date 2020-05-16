@@ -34,6 +34,9 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 	private int xNext = 0;
 	private int yNext = 0;
 
+	private RenderLayer solidLayer;
+	private RenderLayer seeThroughLayer;
+
 	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureUtil;method_24960(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
 	private void hookPrepareImage(NativeImage.GLFormat format, int glId, int w, int h) {
 		if(FontTextureHelper.isNice) {
@@ -42,9 +45,13 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 			size = FontTextureHelper.SIZE;
 			cellHeight = FontTextureHelper.ceil16(FontTextureHelper.CELL_HEIGHT);
 			setFilter(false, true);
+			solidLayer = FontTextureHelper.getTextLod(id);
+			seeThroughLayer = FontTextureHelper.getTextLodSeeThrough(id);
 		} else {
 			TextureUtil.method_24960(format, glId, w, h);
 			isNice = false;
+			solidLayer = field_21690;
+			seeThroughLayer = field_21691;
 		}
 	}
 
@@ -76,8 +83,8 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 		glyph.upload(x, y);
 
 		return new GlyphRenderer(
-				field_21690, // first render layer
-				field_21691, // second render layer
+				solidLayer, // first render layer
+				seeThroughLayer, // second render layer
 				(p + x + 0.01F) / size, // umin
 				(p + x - 0.01F + glyph.getWidth()) / size, // umax
 				(p + y + 0.01F) / size, // vmin

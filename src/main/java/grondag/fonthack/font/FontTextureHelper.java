@@ -1,6 +1,16 @@
 package grondag.fonthack.font;
 
+import static net.minecraft.client.render.RenderPhase.ALWAYS_DEPTH_TEST;
+import static net.minecraft.client.render.RenderPhase.COLOR_MASK;
+import static net.minecraft.client.render.RenderPhase.ENABLE_LIGHTMAP;
+import static net.minecraft.client.render.RenderPhase.ONE_TENTH_ALPHA;
+import static net.minecraft.client.render.RenderPhase.TRANSLUCENT_TRANSPARENCY;
+
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.client.texture.NativeImage;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 
 public class FontTextureHelper {
@@ -84,5 +94,13 @@ public class FontTextureHelper {
 		//		final int result = MathHelper.clamp((int)(Math.pow(v, 0.45454545454545453D) * 255.0D), 0, 255);
 		//
 		//		return (byte) result; // < 96 ? 0 : (byte) result;
+	}
+
+	public static RenderLayer getTextLod(Identifier texture) {
+		return RenderLayer.of("text", VertexFormats.POSITION_COLOR_TEXTURE_LIGHT, 7, 256, false, true, RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, false, true)).alpha(ONE_TENTH_ALPHA).transparency(TRANSLUCENT_TRANSPARENCY).lightmap(ENABLE_LIGHTMAP).build(false));
+	}
+
+	public static RenderLayer getTextLodSeeThrough(Identifier texture) {
+		return RenderLayer.of("text_see_through", VertexFormats.POSITION_COLOR_TEXTURE_LIGHT, 7, 256, false, true, RenderLayer.MultiPhaseParameters.builder().texture(new RenderPhase.Texture(texture, false, true)).alpha(ONE_TENTH_ALPHA).transparency(TRANSLUCENT_TRANSPARENCY).lightmap(ENABLE_LIGHTMAP).depthTest(ALWAYS_DEPTH_TEST).writeMaskState(COLOR_MASK).build(false));
 	}
 }
