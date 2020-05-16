@@ -29,4 +29,9 @@ public class MixinFontManager implements FontManagerExt {
 			return fontStorages.getOrDefault(idOverrides.getOrDefault(identifier, identifier), missingStorage);
 		});
 	}
+
+	@Override
+	public FontStorage ext_getFontStorage(Identifier fontId) {
+		return fontStorages.getOrDefault(idOverrides.getOrDefault(fontId, fontId), missingStorage);
+	}
 }

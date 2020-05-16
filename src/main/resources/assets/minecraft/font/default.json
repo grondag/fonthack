@@ -3,7 +3,7 @@
         {
             "type": "ttf",
             "file": "fonthack:source_sans_pro-regular.otf",
-            "size": 16,
+            "size": 11.5,
             "oversample": 2,
             "skip": [
              	"\u20b9\ue0ff\ueffd\uf000\uf001\uf002\uf0ff\uf200\uf506\uf507\uf508\uf509\uf50a\uf50b\uf50c",

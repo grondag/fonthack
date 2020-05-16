@@ -5,10 +5,18 @@ import net.minecraft.util.math.MathHelper;
 
 public class FontTextureHelper {
 
-	public static int size = 512;
-	public static int cellHeight  = 64;
-	public static int padding = 4;
-	public static int lod = 3;
+	public static final int SIZE = 512;
+	public static final int CELL_HEIGHT  = 64;
+	/** padding for LOD filter, all sides */
+	public static final int PADDING = 4;
+
+	/** renderable area after padding */
+	public static final int RENDERABLE_CELL_HEIGHT = CELL_HEIGHT - PADDING - PADDING;
+
+	/** vanilla forces descent to be 3 vs 9 overall */
+	public static final int DESCENT_PADDING = RENDERABLE_CELL_HEIGHT / 4;
+	public static final int ASCENT = RENDERABLE_CELL_HEIGHT - DESCENT_PADDING;
+	public static final int LOD = 3;
 	public static boolean isNice;
 
 	private static final float[] LUMINANCE_TO_LINEAR_MAP = new float[256];

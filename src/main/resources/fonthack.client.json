@@ -5,10 +5,10 @@
   "mixins": [
   	"MixinFontType",
   	"MixinFontStorage",
+  	"MixinFontManager",
   	"MixinGlyphAtlasTexture",
   	"MixinMinecraftClient",
   	"MixinNativeImage",
-    "MixinTextRenderer",
     "MixinTrueTypeFont",
     "MixinTrueTypeFontGlyph"
   ],

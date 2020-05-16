@@ -12,14 +12,16 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.InputStream;
+import java.util.stream.IntStream;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import it.unimi.dsi.fastutil.chars.Char2FloatOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
+import it.unimi.dsi.fastutil.ints.IntCollection;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.lwjgl.system.MemoryStack;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.Font;
@@ -30,6 +32,7 @@ import net.minecraft.util.Identifier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+import grondag.fonthack.FontHackClient;
 import grondag.fonthack.ext.RenderableGlyphExt;
 
 /**
@@ -47,8 +50,8 @@ public class NiceFont implements Font {
 	private final Identifier id;
 	private final float oversample;
 	private final IntSet excludedCharacters = new IntArraySet();
-	//	private final float shiftX;
-	//	private final float shiftY;
+	private final float shiftX;
+	private final float shiftY;
 	//	private final float scaleFactor;
 	private final float ascent;
 	private final float fontHeight;
@@ -61,7 +64,6 @@ public class NiceFont implements Font {
 	private final FontRenderContext frc;
 
 
-	// TODO: remove scale and oversample if not used
 	public NiceFont(Identifier id, float scale, float oversampleIgnored, float shiftX, float shiftY, String excluded) {
 		this.id = id;
 
@@ -70,25 +72,26 @@ public class NiceFont implements Font {
 		layoutFlags = isRightToLeft ? java.awt.Font.LAYOUT_RIGHT_TO_LEFT : java.awt.Font.LAYOUT_LEFT_TO_RIGHT;
 		frc = new FontRenderContext(null, RenderingHints.VALUE_TEXT_ANTIALIAS_ON, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 
-		excluded.chars().forEach((int_1) -> {
-			excludedCharacters.add(int_1 & '\uffff');
-		});
-		//		this.shiftX = shiftX * oversample;
-		//		this.shiftY = shiftY * oversample;
+		excluded.codePoints().forEach(excludedCharacters::add);
 
-		// TODO: find the size that maximizes efficient space usage
-		awtFont = getFont(id, 52);
-
+		awtFont = getFont(id, FontTextureHelper.ASCENT);
 		final BufferedImage sizeImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
 		final Graphics2D sizeGraphics = (Graphics2D) sizeImage.getGraphics();
 		sizeGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		sizeGraphics.setFont(awtFont);
 		fontMetrics = sizeGraphics.getFontMetrics();
 		fontHeight = fontMetrics.getHeight();
-		oversample = fontHeight / 9; //oversample;
+		oversample = fontHeight / scale;
+		ascent = fontMetrics.getAscent();
+
+		this.shiftX = shiftX * oversample;
+		this.shiftY = shiftY * oversample;
+
+
 		//scaleFactor = STBTruetype.stbtt_ScaleForPixelHeight(info, scale * oversample);
 		//		scaleFactor = fontHeight / (FontTextureHelper.cellHeight - FontTextureHelper.padding * 2);
-		ascent = fontMetrics.getAscent();
+		//		ascent = fontMetrics.getAscent();
+		//		descent = fontMetrics.getDescent();
 	}
 
 	private @Nullable java.awt.Font getFont(Identifier res, float size)
@@ -113,11 +116,7 @@ public class NiceFont implements Font {
 		if (excludedCharacters.contains(c)) {
 			return null;
 		} else {
-			try (final MemoryStack memStack = MemoryStack.stackPush()) {
-				return new NiceGlyph(c);
-			} catch (final Exception e) {
-				return null;
-			}
+			return new NiceGlyph(c);
 		}
 	}
 
@@ -125,7 +124,7 @@ public class NiceFont implements Font {
 	public class NiceGlyph implements RenderableGlyphExt {
 		private final int width;
 		private final int height;
-		private final float bearingX;
+		//private final float bearingX;
 		private final float glyphAscent;
 		private final float rawAdvance;
 		private final float scaledAdvance;
@@ -139,8 +138,8 @@ public class NiceFont implements Font {
 			height = fontMetrics.getHeight();
 			rawAdvance = computeAdvance(c);
 			scaledAdvance = rawAdvance / oversample;
-			bearingX = 0 / oversample;
-			glyphAscent = ascent / oversample;
+			// bearingX = 0 / oversample;
+			glyphAscent = (FontTextureHelper.DESCENT_PADDING + FontTextureHelper.PADDING - fontMetrics.getDescent()) / oversample;
 			//			glyphIndex = c;
 			this.c = c;
 		}
@@ -175,7 +174,18 @@ public class NiceFont implements Font {
 
 		@Override
 		public float getBearingX() {
-			return bearingX;
+			return 0;
+		}
+
+		@Override
+		public float getXMin() {
+			return 0;
+		}
+
+		// logic is not changed - here for docs
+		@Override
+		public float getXMax() {
+			return getWidth() / getOversample();
 		}
 
 		@Override
@@ -184,9 +194,23 @@ public class NiceFont implements Font {
 			return 0.5F;
 		}
 
+		// font min Y vertex is drawn offset at this - 3f (0)
+		// logic is not changed - here for docs
+		@Override
+		public float getYMin() {
+			return getAscent();
+		}
+
+		// font max Y vertex is drawn ofset at this - 3f
+		// logic is not changed - here for docs
+		@Override
+		public float getYMax() {
+			return getYMin() + getHeight() / getOversample();
+		}
+
 		@Override
 		public float getAscent() {
-			return 3.0F;
+			return glyphAscent;
 		}
 
 		@Override
@@ -211,8 +235,8 @@ public class NiceFont implements Font {
 
 		@Override
 		public void upload(int x, int y) {
-			final int p = FontTextureHelper.padding;
-			final int h = FontTextureHelper.cellHeight;
+			final int p = FontTextureHelper.PADDING;
+			final int h = FontTextureHelper.CELL_HEIGHT;
 			final int w = FontTextureHelper.ceil16(width + p + p);
 
 			try(final NativeImage img0 = new NativeImage(NativeImage.Format.RGBA, 64, 64, false);
@@ -235,9 +259,9 @@ public class NiceFont implements Font {
 
 				img0.upload(0, x, y, 0, 0, w, h, true, true, true, false);
 
-				// TODO: remove
-				if (height + p + p > FontTextureHelper.cellHeight) {
-					System.out.println("Exceeded cell height: " + y + p + p);
+				// TODO: remove or supress
+				if (height + p + p > FontTextureHelper.CELL_HEIGHT) {
+					FontHackClient.LOG.warn(String.format("[FontHack] Exceeded cell height for %s, %d vs %d limit.", Character.toString(c), height + p + p, FontTextureHelper.CELL_HEIGHT));
 				}
 
 				final NativeImage images[] = new NativeImage[4];
@@ -250,10 +274,10 @@ public class NiceFont implements Font {
 
 				//				if (c == 'S') {
 				//					try {
-				//						img0.writeFile(c + "_0_out.png");
-				//						img1.writeFile(c + "_1_out.png");
-				//						img2.writeFile(c + "_2_out.png");
-				//						img3.writeFile(c + "_3_out.png");
+				//						img0.writeFile(new File(MinecraftClient.getInstance().runDirectory, "S_0_out.png"));
+				//						img1.writeFile(new File(MinecraftClient.getInstance().runDirectory, "S_1_out.png"));
+				//						img2.writeFile(new File(MinecraftClient.getInstance().runDirectory, "S_2_out.png"));
+				//						img3.writeFile(new File(MinecraftClient.getInstance().runDirectory, "S_3_out.png"));
 				//					} catch (final IOException e) {
 				//					}
 				//				}
@@ -272,9 +296,7 @@ public class NiceFont implements Font {
 			gt.setFont(awtFont);
 			gt.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			gt.setColor(Color.WHITE);
-
-			// TODO: should really use MaxAscent here? Would likely waste space
-			gt.drawString(String.valueOf(c), FontTextureHelper.padding, fontMetrics.getAscent() + FontTextureHelper.padding);
+			gt.drawString(String.valueOf(c), FontTextureHelper.PADDING, FontTextureHelper.ASCENT + FontTextureHelper.PADDING);
 
 			return fontImage;
 		}
@@ -287,7 +309,9 @@ public class NiceFont implements Font {
 
 	@Override
 	public IntSet method_27442() {
-		return excludedCharacters;
+		return IntStream.range(0, 65535).filter((i) -> {
+			return !excludedCharacters.contains(i);
+		}).collect(IntOpenHashSet::new, IntCollection::add, IntCollection::addAll);
 	}
 }
 

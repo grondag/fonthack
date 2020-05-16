@@ -37,10 +37,10 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 	@Redirect(method = "<init>*", require = 1, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/texture/TextureUtil;method_24960(Lnet/minecraft/client/texture/NativeImage$GLFormat;III)V"))
 	private void hookPrepareImage(NativeImage.GLFormat format, int glId, int w, int h) {
 		if(FontTextureHelper.isNice) {
-			TextureUtil.method_24961(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.lod, FontTextureHelper.size, FontTextureHelper.size);
+			TextureUtil.method_24961(NativeImage.GLFormat.RGBA, glId, FontTextureHelper.LOD, FontTextureHelper.SIZE, FontTextureHelper.SIZE);
 			isNice = true;
-			size = FontTextureHelper.size;
-			cellHeight = FontTextureHelper.ceil16(FontTextureHelper.cellHeight);
+			size = FontTextureHelper.SIZE;
+			cellHeight = FontTextureHelper.ceil16(FontTextureHelper.CELL_HEIGHT);
 			setFilter(false, true);
 		} else {
 			TextureUtil.method_24960(format, glId, w, h);
@@ -57,13 +57,14 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 
 	private GlyphRenderer getNiceGlyphRenderer(RenderableGlyph glyph) {
 		bindTexture();
-		final int p = FontTextureHelper.padding;
+		final int p = FontTextureHelper.PADDING;
 		final int w = FontTextureHelper.ceil16(glyph.getWidth() + p * 2);
 
 		if (xNext + w > size) {
 			if (yNext + cellHeight > size) {
 				return null;
 			}
+
 			yNext += cellHeight;
 			xNext = 0;
 		}
@@ -74,9 +75,16 @@ public abstract class MixinGlyphAtlasTexture extends AbstractTexture {
 
 		glyph.upload(x, y);
 
-		return new GlyphRenderer(field_21690, field_21691,
-				(p + x + 0.01F) / size, (p + x - 0.01F + glyph.getWidth()) / size,
-				(p + y + 0.01F) / size, (p + y - 0.01F + glyph.getHeight()) / size,
-				glyph.getXMin(), glyph.getXMax(), glyph.getYMin(), glyph.getYMax());
+		return new GlyphRenderer(
+				field_21690, // first render layer
+				field_21691, // second render layer
+				(p + x + 0.01F) / size, // umin
+				(p + x - 0.01F + glyph.getWidth()) / size, // umax
+				(p + y + 0.01F) / size, // vmin
+				(p + y - 0.01F + glyph.getHeight()) / size, // vmax
+				glyph.getXMin(), // xmin
+				glyph.getXMax(), // xmax
+				glyph.getYMin(), // ymin
+				glyph.getYMax()); // ymax
 	}
 }
