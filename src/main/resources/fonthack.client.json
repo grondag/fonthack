@@ -6,16 +6,6 @@
   	"MixinFontManager",
   	"MixinMinecraftClient"
   ],
-  "_mixins": [
-  	"MixinFontType",
-  	"MixinFontStorage",
-  	"MixinFontManager",
-  	"MixinGlyphAtlasTexture",
-  	"MixinMinecraftClient",
-  	"MixinNativeImage",
-    "MixinTrueTypeFont",
-    "MixinTrueTypeFontGlyph"
-  ],
   "injectors": {
     "defaultRequire": 1
   }
