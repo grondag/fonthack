@@ -14,8 +14,4 @@ dependencies {
 
   modApi "net.fabricmc:fabric-loader:${loader_version}"
   modApi "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-
-	// dev env annotation support
-	compileOnly "org.apiguardian:apiguardian-api:1.0.0"
-	compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 }
