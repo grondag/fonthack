@@ -3,7 +3,7 @@ package grondag.fonthack;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import grondag.fonthack.ext.FontManagerExt;
-import grondag.fonthack.ext.MinecraftClientExt;
+import grondag.fonthack.ext.MinecraftExt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.resources.ResourceLocation;
@@ -17,6 +17,6 @@ public class FontHackClient {
 	 * Text renderer with given font as the default font.
 	 */
 	public static Font getTextRenderer(ResourceLocation fontId) {
-		return ((FontManagerExt)((MinecraftClientExt)Minecraft.getInstance()).ext_fontManager()).ext_createTextRenderer(fontId);
+		return ((FontManagerExt)((MinecraftExt)Minecraft.getInstance()).ext_fontManager()).ext_createTextRenderer(fontId);
 	}
 }

@@ -12,9 +12,9 @@ import grondag.fonthack.ext.FontManagerExt;
 
 @Mixin(FontManager.class)
 public class MixinFontManager implements FontManagerExt {
-	@Shadow private FontSet missingStorage;
-	@Shadow private Map<ResourceLocation, FontSet> fontStorages;
-	@Shadow private Map<ResourceLocation, ResourceLocation> idOverrides;
+	@Shadow private FontSet missingFontSet;
+	@Shadow private Map<ResourceLocation, FontSet> fontSets;
+	@Shadow private Map<ResourceLocation, ResourceLocation> renames;
 
 	@Override
 	public Font ext_createTextRenderer(ResourceLocation fontId) {
@@ -23,12 +23,12 @@ public class MixinFontManager implements FontManagerExt {
 				identifier = fontId;
 			}
 
-			return fontStorages.getOrDefault(idOverrides.getOrDefault(identifier, identifier), missingStorage);
+			return fontSets.getOrDefault(renames.getOrDefault(identifier, identifier), missingFontSet);
 		});
 	}
 
 	@Override
 	public FontSet ext_getFontStorage(ResourceLocation fontId) {
-		return fontStorages.getOrDefault(idOverrides.getOrDefault(fontId, fontId), missingStorage);
+		return fontSets.getOrDefault(renames.getOrDefault(fontId, fontId), missingFontSet);
 	}
 }
