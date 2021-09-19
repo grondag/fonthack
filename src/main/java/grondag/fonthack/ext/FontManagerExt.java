@@ -1,14 +1,14 @@
 package grondag.fonthack.ext;
 
-import net.minecraft.client.font.FontStorage;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.font.FontSet;
+import net.minecraft.resources.ResourceLocation;
 
 public interface FontManagerExt {
 	/**
 	 * Text renderer with given font as the default font.
 	 */
-	TextRenderer ext_createTextRenderer(Identifier fontId);
+	Font ext_createTextRenderer(ResourceLocation fontId);
 
-	FontStorage ext_getFontStorage(Identifier fontId);
+	FontSet ext_getFontStorage(ResourceLocation fontId);
 }

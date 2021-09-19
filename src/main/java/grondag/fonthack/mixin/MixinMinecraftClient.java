@@ -2,13 +2,11 @@ package grondag.fonthack.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.FontManager;
-
 import grondag.fonthack.ext.MinecraftClientExt;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.font.FontManager;
 
-@Mixin(MinecraftClient.class)
+@Mixin(Minecraft.class)
 public class MixinMinecraftClient implements MinecraftClientExt {
 	@Shadow private FontManager fontManager;
 
